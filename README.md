@@ -35,6 +35,7 @@ pip3 install -r requirements.txt
 ### 4. Set Up the Database
 Run the following commands to create the database and apply migrations:
 ```bash
+python3 manage.py makemigrations
 python3 manage.py migrate
 ```
 
@@ -69,19 +70,15 @@ DataScienceSpotter/
 └── README.md               # This file
 ```
 
-## Deployment
-For deploying to a production environment, refer to the Django documentation for guidance on:
-- Setting `DEBUG = False`
-- Configuring allowed hosts
-- Database settings
-- Static and media files
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contributing
-Feel free to contribute to this project by submitting a pull request or opening an issue.
-
----
-
-This README now reflects the `.venv` folder used for the virtual environment setup in VSCode.
+## Register Fake User Request "localhost"
+```
+curl -X 'POST' \
+  'http://127.0.0.1:8000/api/register/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "username": "root",
+    "password": "root",
+    "password2": "root"
+  }'
+```

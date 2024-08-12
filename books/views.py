@@ -50,3 +50,9 @@ class FavoriteBookView(APIView):
         # Remove the book from the user's favorites
         user.profile.favorite_books.remove(book)
         return Response({'status': 'book removed from favorites'}, status=status.HTTP_200_OK)
+
+class RecommendationView(APIView):
+    def post(self, request):
+        user_favorites = request.data.get('favorites', [])  # Expecting a list of book IDs
+        recommendations = recommend_books(user_favorites)
+        return Response({'recommendations': recommendations}, status=status.HTTP_200_OK)
