@@ -35,26 +35,26 @@ pip3 install -r requirements.txt
 ### 4. Set Up the Database
 Run the following commands to create the database and apply migrations:
 ```bash
-python manage.py migrate
+python3 manage.py migrate
 ```
 
 ### 5. Create a Superuser
 To access the Django admin panel, create a superuser:
 ```bash
-python manage.py createsuperuser
+python3 manage.py createsuperuser
 ```
 
 ### 6. Run the Development Server
 Start the Django development server:
 ```bash
-python manage.py runserver
+python3 manage.py runserver
 ```
 Visit `http://127.0.0.1:8000/` in your browser to access the application.
 
 ## Testing
 To run the tests for the project:
 ```bash
-python manage.py test
+python3 manage.py test
 ```
 
 ## Directory Structure
