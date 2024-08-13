@@ -78,7 +78,7 @@ class FavoriteBookView(APIView):
 class RecommendationView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request):
+    def get(self, request):
         user = request.user
         if not user.is_authenticated:
             return Response({"error": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
