@@ -1,5 +1,8 @@
-drf_yasg
+numpy 
+scipy
 django 
+drf_yasg
 psycopg2
+scikit-learn
 djangorestframework 
 djangorestframework-simplejwt

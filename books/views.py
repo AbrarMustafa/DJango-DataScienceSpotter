@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .models import Book
 from .serializers import BookSerializer
-from .services import recommend_books  # Custom recommendation logic
+from .services import recommend_books 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -55,17 +55,26 @@ class FavoriteBookView(APIView):
     def post(self, request, pk):
         user = request.user
         book = get_object_or_404(Book, pk=pk)
+
+        if user.profile.favorite_books.count() >= 20:
+            return Response({'error': 'You can only have up to 20 favorite books.'}, status=status.HTTP_400_BAD_REQUEST)
+
         user.profile.favorite_books.add(book)
-        return Response({'status': 'book added to favorites'}, status=status.HTTP_200_OK)
+        return Response({'status': 'Book added to favorites'}, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         user = request.user
         book = get_object_or_404(Book, pk=pk)
         user.profile.favorite_books.remove(book)
-        return Response({'status': 'book removed from favorites'}, status=status.HTTP_200_OK)
+        return Response({'status': 'Book removed from favorites'}, status=status.HTTP_200_OK)
+
 
 class RecommendationView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
-        user_favorites = request.data.get('favorites', [])  # Expecting a list of book IDs
-        recommendations = recommend_books(user_favorites)
-        return Response({'recommendations': recommendations}, status=status.HTTP_200_OK)
+        user = request.user
+        recommended_books = recommend_books(user)
+        
+        serializer = BookSerializer(recommended_books, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
