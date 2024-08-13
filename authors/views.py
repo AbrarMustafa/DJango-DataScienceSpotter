@@ -2,16 +2,27 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from .models import Author
 from .serializers import UserSerializer, RegisterSerializer, AuthorSerializer
 
+class IsAdminOrReadOnly(BasePermission):
+    """
+    Custom permission to only allow admins to edit objects.
+    """
+    def has_permission(self, request, view):
+        if request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+            return request.user and request.user.is_staff
+        return True
+
+
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    permission_classes = [IsAdminOrReadOnly]
 
     # Override the create, update, and delete methods to require authentication
     def create(self, request, *args, **kwargs):

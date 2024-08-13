@@ -1,5 +1,5 @@
-from rest_framework import viewsets, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, status, filters
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -7,12 +7,29 @@ from django.shortcuts import get_object_or_404
 from .models import Book
 from .serializers import BookSerializer
 from .services import recommend_books  # Custom recommendation logic
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.SearchFilter] 
+    search_fields = ['title', 'author__name'] 
 
-    # Override the create, update, and delete methods to require authentication
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAuthenticated] 
+        else:
+            self.permission_classes = [IsAuthenticatedOrReadOnly] 
+        return super().get_permissions()
+    
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('search', openapi.IN_QUERY, description="Search by title or author", type=openapi.TYPE_STRING)
+    ])
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
     def create(self, request, *args, **kwargs):
         self.permission_classes = [IsAuthenticated]
         return super().create(request, *args, **kwargs)
@@ -38,16 +55,12 @@ class FavoriteBookView(APIView):
     def post(self, request, pk):
         user = request.user
         book = get_object_or_404(Book, pk=pk)
-
-        # Add the book to the user's favorites
         user.profile.favorite_books.add(book)
         return Response({'status': 'book added to favorites'}, status=status.HTTP_200_OK)
 
     def delete(self, request, pk):
         user = request.user
         book = get_object_or_404(Book, pk=pk)
-
-        # Remove the book from the user's favorites
         user.profile.favorite_books.remove(book)
         return Response({'status': 'book removed from favorites'}, status=status.HTTP_200_OK)
 

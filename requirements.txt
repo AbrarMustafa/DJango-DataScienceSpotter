@@ -1,4 +1,5 @@
 drf_yasg
 django 
+psycopg2
 djangorestframework 
 djangorestframework-simplejwt
