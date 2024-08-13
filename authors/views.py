@@ -6,8 +6,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny, BasePermission
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from books.models import Book
 from .models import Author
 from .serializers import UserSerializer, RegisterSerializer, AuthorSerializer
+from books.serializers import BookSerializer
+from rest_framework import generics
 
 class IsAdminOrReadOnly(BasePermission):
     """
@@ -37,14 +40,19 @@ class AuthorViewSet(viewsets.ModelViewSet):
         self.permission_classes = [IsAuthenticated]
         return super().destroy(request, *args, **kwargs)
 
-    @action(detail=True, methods=['get'])
-    def books(self, request, pk=None):
-        author = get_object_or_404(Author, pk=pk)
-        books = author.books.all()  # Assuming the Author model has a reverse relation to books
-        serializer = self.get_serializer(books, many=True)
-        return Response(serializer.data)
+    # @action(detail=True, methods=['get'])
+    # def books(self, request, pk=None):
+    #     author = get_object_or_404(Author, pk=pk)
+    #     books = author.books.all()  # Assuming the Author model has a reverse relation to books
+    #     serializer = self.get_serializer(books, many=True)
+    #     return Response(serializer.data)
 
+class AuthorBooksListView(generics.ListAPIView):
+    serializer_class = BookSerializer
 
+    def get_queryset(self):
+        author_id = self.kwargs['author_id']
+        return Book.objects.filter(author_id=author_id)
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 

@@ -1,3 +1,4 @@
+Faker
 numpy 
 scipy
 django 

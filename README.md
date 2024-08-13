@@ -70,15 +70,22 @@ DataScienceSpotter/
 └── README.md               # This file
 ```
 
-## Register Fake User Request "localhost"
+## Seed Json File Data
+```bash
+python3 manage.py seed_authors
+python3 manage.py seed_books
 ```
+
+## Register Fake User Request "localhost"
+```bash
 curl -X 'POST' \
   'http://127.0.0.1:8000/api/register/' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-    "username": "root",
-    "password": "root",
-    "password2": "root"
+    "username": "author1",
+    "password": "author1",
+    "password2": "author1"
   }'
 ```
+
