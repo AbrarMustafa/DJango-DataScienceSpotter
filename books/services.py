@@ -3,7 +3,18 @@ from collections import Counter
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-from collections import Counter
+
+def compute_similarity_matrix(books):
+    # Example feature vectors for each book (genre, author, etc.)
+    features = np.array([[book.genre, book.author] for book in books])
+    similarity_matrix = cosine_similarity(features)
+    return similarity_matrix
+
+def get_similar_books(book, books, similarity_matrix):
+    index = books.index(book)
+    similar_indices = similarity_matrix[index].argsort()[-6:-1]  # Top 5 similar books
+    return [books[i] for i in similar_indices]
+
 
 def recommend_books(user):
     favorites = user.profile.favorite_books.all()
@@ -25,15 +36,3 @@ def recommend_books(user):
     return recommended_books
 
 
-
-
-def compute_similarity_matrix(books):
-    # Example feature vectors for each book (genre, author, etc.)
-    features = np.array([[book.genre, book.author] for book in books])
-    similarity_matrix = cosine_similarity(features)
-    return similarity_matrix
-
-def get_similar_books(book, books, similarity_matrix):
-    index = books.index(book)
-    similar_indices = similarity_matrix[index].argsort()[-6:-1]  # Top 5 similar books
-    return [books[i] for i in similar_indices]
