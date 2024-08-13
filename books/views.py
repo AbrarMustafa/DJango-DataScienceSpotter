@@ -80,15 +80,14 @@ class RecommendationView(APIView):
 
     def post(self, request):
         user = request.user
-
         if not user.is_authenticated:
             return Response({"error": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
-
         try:
             user_profile = user.profile  # Ensure the profile exists
         except Profile.DoesNotExist:
             return Response({"error": "User profile does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Get recommendations based on user's favorites
         recommendations = recommend_books(user)
-        return Response({'recommendations': recommendations}, status=status.HTTP_200_OK)
+
+        serializer = BookSerializer(recommendations, many=True)
+        book_data = serializer.data
+        return Response(book_data, status=status.HTTP_200_OK)

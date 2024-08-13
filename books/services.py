@@ -3,11 +3,26 @@ from collections import Counter
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+import numpy as np
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics.pairwise import cosine_similarity
 
 def compute_similarity_matrix(books):
-    # Example feature vectors for each book (genre, author, etc.)
-    features = np.array([[book.genre, book.author] for book in books])
-    similarity_matrix = cosine_similarity(features)
+    # Extract features from books
+    genres = [str(book.genre) for book in books]
+    authors = [str(book.author) for book in books]
+
+    # Combine features into a single array
+    combined_features = np.array(list(zip(genres, authors)))
+
+    # Initialize OneHotEncoder
+    encoder = OneHotEncoder()
+    
+    # Fit and transform combined features
+    encoded_features = encoder.fit_transform(combined_features).toarray()
+    
+    # Compute similarity matrix
+    similarity_matrix = cosine_similarity(encoded_features)
     return similarity_matrix
 
 def get_similar_books(book, books, similarity_matrix):
